@@ -1,6 +1,8 @@
 window.addEventListener('load', function () {
-    var rockn = rockNroll()
-    var played = false;
+    var drums = addDrums()
+    var rockn = rockNroll().then(drums)
+    var samples = samplesPrompt()
+    var played = false
 
     var button = document.getElementById('restart')
     button.setStatus = function (status) {
@@ -16,7 +18,23 @@ window.addEventListener('load', function () {
             }
         }
     }
-    button.addEventListener('click', throttle(restart(), 300))
+
+    button.addEventListener('click', restart())
+
+    var addDrumButton = document.getElementById('add')
+    addDrumButton.addEventListener('click', samples.open)
+    samples.onAdded(function (selected) {
+        rockNroll([addLocation('Samples/' + selected)])
+        .then(drums)
+    })
+    samples.onPreview(function (selected) {
+        rockNroll([addLocation('Samples/' + selected)])
+        .then(function (instruments) {
+            instruments.map(function (instrument) {
+                instrument(null, 0)
+            })
+        })
+    })
 
     function start () {
         if (played) return
@@ -58,9 +76,11 @@ var FILES = [
     'sounds/kick.wav',
     'sounds/snare.wav',
     'sounds/hihat.wav'
-].map(function (n) {
+].map(addLocation)
+
+function addLocation (n) {
     return location.href + n
-})
+}
 
 var DRUMS = {
     startTime: 1 / 4,
@@ -72,14 +92,13 @@ var DRUMS = {
     }]
 }
 
-function rockNroll () {
-    var context = audioContext()
-    var sounds = loadSounds(FILES)
+var maincontext = audioContext()
+function rockNroll (files) {
+    var sounds = loadSounds(files || FILES)
 
-    return context
+    return maincontext
     .then(decodeSounds(sounds))
-    .app(sources, context)
-    .then(addDrums())
+    .app(sources, maincontext)
 }
 
 function addDrums () {
@@ -99,28 +118,18 @@ function addDrums () {
 
 function createPad (instrument) {
     var pad = document.createElement('div')
-    var throttled = throttle(hit, 300)
     pad.classList.add('pad')
-    pad.activate = activatePad(pad)
-    pad.addEventListener('mousedown', throttled)
-    pad.addEventListener('touchstart', throttled)
+    pad.activate = activate(pad, 'active')
+    pad.addEventListener('mousedown', hit)
+    pad.addEventListener('touchstart', hit)
     pad.hit = hit
 
-    function hit () {
+    function hit (evt) {
+        evt && evt.preventDefault()
         instrument(pad, 0)
     }
 
     return pad
-}
-
-function activatePad (pad) {
-    var add = function () {
-        pad.classList.add('active')
-    }
-    var remove = debounce(function () {
-        pad.classList.remove('active')
-    }, 200)
-    return pipe(add, remove)
 }
 
 function audioContext () {
@@ -130,7 +139,7 @@ function audioContext () {
     })
 };
 
-var decodeSounds = curry(function setupBand (sounds, context) {
+var decodeSounds = _.curry(function setupBand (sounds, context) {
     return sounds.then(decodeAll(context))
 })
 
@@ -152,23 +161,23 @@ function loadSound (url) {
     })
 }
 
-var decodeAll = curry(function decodeSounds (context, buffers) {
+var decodeAll = _.curry(function decodeSounds (context, buffers) {
     return Promise.all(buffers.map(decode(context)));
 })
 
-var decode = curry(function decodeSound (context, buffer) {
+var decode = _.curry(function decodeSound (context, buffer) {
     return new Promise((res, rej) => {
         context.decodeAudioData(buffer, res, rej)
     })
 })
 
-var sources = curry(function (context, buffers) {
+var sources = _.curry(function (context, buffers) {
     return buffers.map(function (buffer) {
         return source(context, buffer)
     })
 })
 
-var source = curry(function createSource (context, buffer, tab, time) {
+var source = _.curry(function createSource (context, buffer, tab, time) {
     var source = context.createBufferSource()
     source.buffer = buffer
     source.connect(context.destination)
@@ -181,7 +190,7 @@ var source = curry(function createSource (context, buffer, tab, time) {
     })
 })
 
-var play = curry(function playSong (music, instruments) {
+var play = _.curry(function playSong (music, instruments) {
     var startTime = music.startTime || 0;
     var eighthNoteTime = music.eighthNoteTime || 1 / 2;
     var bars = music.bars || [];
@@ -198,124 +207,9 @@ var play = curry(function playSong (music, instruments) {
     }))
 })
 
-var note = curry(function noteTiming (eighth, time, i) {
+var note = _.curry(function noteTiming (eighth, time, i) {
     return time + i * eighth
 })
-
-Promise.prototype.log = function (l) {
-    return this.then(function (v) {
-        console.log(l, v)
-        return v
-    })
-}
-
-Promise.prototype.val = function (v) {
-    return this.then(function () {
-        return v;
-    })
-}
-
-Promise.prototype.err = function (l) {
-    return this.catch(function (v) {
-        console.log(l, v);
-    })
-}
-
-Promise.prototype.app = function () {
-    var fn = arguments[0]
-    var qs = Array.prototype.slice.call(arguments, 1);
-    return this.then(function (v) {
-        return Promise.all(qs)
-        .then(function (vs) {
-            return fn.apply(null, vs.concat([v]))
-        })
-    })
-}
-
-Promise.flattenAll = function (nested) {
-
-    function flatMap (arr) {
-        return arr.reduce(function (p, c) {
-            if (Array.isArray(c)) {
-                return p.concat(flatMap(c))
-            }
-            return p.concat(c)
-        }, [])
-    }
-
-    return Promise.all(flatMap(nested).map(function (v) {
-        return Promise.resolve(v)
-    }))
-}
-
-Array.prototype.do = function (fn) {
-    return this.map(function (v, i, arr) {
-        fn(v, i, arr);
-        return v;
-    })
-}
-
-Promise.try = function (fn) {
-    return new Promise((res, rej) => {
-        try {
-            res(fn())
-        } catch (err) {
-            rej(err)
-        }
-    })
-}
-
-function first (arr) {
-    if (!arr) return null;
-    return arr[0]
-}
-
-function curry (fn) {
-  var arity = fn.length
-
-  return function curryN () {
-    var args = Array.prototype.slice.call(arguments, 0);
-
-    if (args.length >= arity) {
-      return fn.apply(null, args)
-    } else {
-      return function () {
-        var args2 = Array.prototype.slice.call(arguments, 0);
-        return curryN.apply(null, args.concat(args2)); 
-      }
-    }
-  }
-}
-
-function debounce (fn, time) {
-    var timer;
-    return function () {
-        clearTimeout(timer)
-        setTimeout(fn, time)
-    }
-}
-
-function pipe () {
-    var fns = Array.prototype.slice.call(arguments, 0);
-    return function (v) {
-        return fns.reduce(function (acc, fn) {
-            return fn(acc)
-        }, v)        
-    }
-}
-
-function throttle (fn, time) {
-    var throttled = false;
-    return function () {
-        if (!throttled) {
-            throttled = true;
-            fn()
-        }
-        setTimeout(function() {
-            throttled = false;
-        }, time)
-    }
-}
 
 function keystroke (l) {
     l = l || {}
