@@ -4,12 +4,15 @@ window.addEventListener('load', function () {
 
     var button = document.getElementById('restart')
     button.setStatus = function (status) {
+        button.disabled = false;
         button.textContent = text();
         function text () {
             switch (status) {
                 case 0: return 'Freestyle';
                 case 1: return 'Stop';
-                case 2: return 'Stopping';
+                default:
+                    button.disabled = true;
+                    return 'Stopping';
             }
         }
     }
