@@ -52,9 +52,9 @@ window.addEventListener('load', function () {
 })
 
 var FILES = [
-    location.href+'sounds/kick.wav',
-    location.href+'sounds/snare.wav',
-    location.href+'sounds/hihat.wav'
+    'sounds/kick.wav',
+    'sounds/snare.wav',
+    'sounds/hihat.wav'
 ]
 
 var DRUMS = {
@@ -69,7 +69,9 @@ var DRUMS = {
 
 function rockNroll () {
     var context = audioContext()
-    var sounds = loadSounds(FILES)
+    var sounds = loadSounds(FILES.map(function (n) {
+        return location.href + n;
+    }))
 
     return context
     .then(decodeSounds(sounds))
