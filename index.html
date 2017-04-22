@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Drum Kit</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            body {margin: 0; width: 100%; height: 100vh; background-color: #333; user-select: none; -webkit-tap-highlight-color: rgba(0,0,0,0);}
+            #kit {position: absolute; top: 0; bottom: 0; right: 0; left: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: center;}
+            .pad {
+                position: relative;
+                margin: 1.5%; flex-basis: 30%; height: 47%; 
+                background-color: #efefef; 
+                border-radius: 14px;
+                border: 1px solid rgba(0,0,0,1);
+                box-shadow: inset 0 0 12px 6px rgba(0,0,0,.3);
+                animation: none;
+                transition: all 0.1s;
+                cursor: pointer;
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-position: center;
+                box-sizing: border-box;
+            }
+            .pad:after {
+                position: absolute;
+                content: '';
+                border-radius: 14px;
+                top: 0; left: 0; right: 0; bottom: 0;
+            }
+            .pad.active {
+                background-blend-mode: screen;
+            }
+            .pad.active:after {
+                animation: 0.2s ease-in-out infinite alternate;
+            }
+            @keyframes neonR {
+                from {box-shadow: 0 0 0 #ff1177, 0 0 0 #ff1177, 0 0 0 #ff1177, 0 0 0 #ff1177, 0 0 0 #ff1177;}
+                to {box-shadow: 0 0 20px #ff1177, 0 0 35px #ff1177, 0 0 40px #ff1177, 0 0 50px #ff1177, 0 0 75px #ff1177;}
+            }
+            @keyframes neonG {
+                from {box-shadow: 0 0 0 #11ff77, 0 0 0 #11ff77, 0 0 0 #11ff77, 0 0 0 #11ff77, 0 0 0 #11ff77;}
+                to {box-shadow: 0 0 20px #11ff77, 0 0 35px #11ff77, 0 0 40px #11ff77, 0 0 50px #11ff77, 0 0 75px #11ff77;}
+            }
+            @keyframes neonY {
+                from {box-shadow: 0 0 0 #ffff77, 0 0 0 #ffff77, 0 0 0 #ffff77, 0 0 0 #ffff77, 0 0 0 #ffff77;}
+                to {box-shadow: 0 0 20px #ffff77, 0 0 35px #ffff77, 0 0 40px #ffff77, 0 0 50px #ffff77, 0 0 75px #ffff77;}
+            }
+            .pad:nth-child(1) {
+                /*background-image: url(/img/drake.jpg)*/
+            }
+            .pad.active:nth-child(1) {
+                color: #ff1177;
+                background-color: rgba(255,0,0,1);
+            }
+            .pad.active:nth-child(1):after {
+                animation-name: neonR;
+            }
+            .pad:nth-child(2) {
+                /*background-image: url(/img/kdot.jpg)*/
+            }
+            .pad.active:nth-child(2) {
+                color: #11ff77;
+                background-color: rgba(0,255,0,1);
+            }
+            .pad.active:nth-child(2):after {
+                animation-name: neonG;
+            }
+            .pad:nth-child(3) {
+                /*background-image: url(/img/jcole.jpg)*/
+            }
+            .pad.active:nth-child(3) {
+                color: #ffff77;
+                background-color: rgba(255,255,0,1);
+            }
+            .pad.active:nth-child(3):after {
+                animation-name: neonY;
+            }
+            button {
+                position: absolute;
+                z-index: 2;
+                bottom: 0;
+                right: 0;
+                left: 0;
+                margin: 2em auto;
+                padding: 0;
+                border: none;
+                outline: none;
+                background-color: #efefef;
+                line-height: 2em;
+                height: 2em;
+                width: 10em;
+                font-size: 20px;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="kit"></div>
+        <button id="restart">Freestyle</button>
+        <script src="main.js"></script>
+    </body>
+</html>
