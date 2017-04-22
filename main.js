@@ -1,4 +1,7 @@
+var maincontext
+
 window.addEventListener('load', function () {
+    maincontext = audioContext()
     var drums = addDrums()
     var rockn = rockNroll().then(drums)
     var samples = samplesPrompt()
@@ -92,7 +95,6 @@ var DRUMS = {
     }]
 }
 
-var maincontext = audioContext()
 function rockNroll (files) {
     var sounds = loadSounds(files || FILES)
 
