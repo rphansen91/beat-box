@@ -55,7 +55,10 @@ var FILES = [
     'sounds/kick.wav',
     'sounds/snare.wav',
     'sounds/hihat.wav'
-]
+].map(function (n) {
+    console.log(location.href)
+    return location.href + n
+})
 
 var DRUMS = {
     startTime: 1 / 4,
@@ -69,10 +72,7 @@ var DRUMS = {
 
 function rockNroll () {
     var context = audioContext()
-    var sounds = loadSounds(FILES.map(function (n) {
-        console.log(location.href)
-        return location.href + n;
-    }))
+    var sounds = loadSounds(FILES)
 
     return context
     .then(decodeSounds(sounds))
