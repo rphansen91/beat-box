@@ -99,7 +99,7 @@ function addDrums () {
 
 function createPad (instrument) {
     var pad = document.createElement('div')
-    var throttled = throttle(hit, 200)
+    var throttled = throttle(hit, 300)
     pad.classList.add('pad')
     pad.activate = activatePad(pad)
     pad.addEventListener('mousedown', throttled)
