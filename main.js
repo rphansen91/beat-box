@@ -56,7 +56,6 @@ var FILES = [
     'sounds/snare.wav',
     'sounds/hihat.wav'
 ].map(function (n) {
-    console.log(location.href)
     return location.href + n
 })
 
