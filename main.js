@@ -52,9 +52,9 @@ window.addEventListener('load', function () {
 })
 
 var FILES = [
-    '/sounds/kick.wav',
-    '/sounds/snare.wav',
-    '/sounds/hihat.wav'
+    location.href+'sounds/kick.wav',
+    location.href+'sounds/snare.wav',
+    location.href+'sounds/hihat.wav'
 ]
 
 var DRUMS = {
