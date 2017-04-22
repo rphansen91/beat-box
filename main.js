@@ -70,6 +70,7 @@ var DRUMS = {
 function rockNroll () {
     var context = audioContext()
     var sounds = loadSounds(FILES.map(function (n) {
+        console.log(location.href)
         return location.href + n;
     }))
 
