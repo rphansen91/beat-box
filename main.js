@@ -12,7 +12,7 @@ window.addEventListener('load', function () {
                 case 1: return 'Stop';
                 default:
                     button.disabled = true;
-                    return 'Stopping';
+                    return 'Stopping...';
             }
         }
     }
